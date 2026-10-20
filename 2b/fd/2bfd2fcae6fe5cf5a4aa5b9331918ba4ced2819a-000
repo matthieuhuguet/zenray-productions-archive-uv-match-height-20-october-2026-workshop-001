@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-20T17:03:28.292Z",
+  "deployedAt": "2026-10-20T16:51:58.113Z",
+  "elapsedSeconds": 690,
+  "status": 200,
+  "built": "assets/index-1N-3mOXB.js",
+  "served": "assets/index-1N-3mOXB.js",
+  "ok": true
+}

@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-20T17:03:28.369Z",
+  "sha256": "555eb9a843947d3929413fb8c2bf38d57cfbea33276161a58803110666af2809",
+  "receipts": {
+    "uv-match-height-20-october-2026": {
+      "expected": 14,
+      "verified": 14
+    },
+    "zenray-edit": {
+      "expected": 14,
+      "verified": 14
+    }
+  },
+  "readBack": {
+    "bytes": 15982831,
+    "sha256": "555eb9a843947d3929413fb8c2bf38d57cfbea33276161a58803110666af2809",
+    "same": true
+  },
+  "workspace": {
+    "status": 200,
+    "fileId": "workshop:Articles/20-October-2026-uv-match-height/index.html",
+    "sha256": "555eb9a843947d3929413fb8c2bf38d57cfbea33276161a58803110666af2809",
+    "fileCount": 63
+  },
+  "catalogue": {
+    "status": 200,
+    "fileId": "workshop:Articles/20-October-2026-uv-match-height/index.html",
+    "sha256": "555eb9a843947d3929413fb8c2bf38d57cfbea33276161a58803110666af2809",
+    "fileCount": null
+  },
+  "ok": true
+}
