@@ -1,0 +1,21 @@
+{
+  "desktop": {
+    "title": "UV-Match Height",
+    "sections": 8,
+    "prompts": 6,
+    "images": true,
+    "brokenAnchors": [],
+    "overflow": false,
+    "serif": true,
+    "chatgpt": true
+  },
+  "mobile": {
+    "overflow": false
+  },
+  "cover": {
+    "width": 360,
+    "bytes": 16400
+  },
+  "errors": [],
+  "ok": true
+}
