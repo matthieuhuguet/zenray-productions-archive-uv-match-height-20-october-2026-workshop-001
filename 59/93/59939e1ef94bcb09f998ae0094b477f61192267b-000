@@ -1,0 +1,45 @@
+// 20 October 2026, 18:56 CEST: verify the exact archive receipts, restore the HTML and read the actual remote project metadata.
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import {createHash} from 'node:crypto'
+import {execFile} from 'node:child_process'
+import {promisify} from 'node:util'
+import {fileURLToPath} from 'node:url'
+import assert from 'node:assert/strict'
+const exec=promisify(execFile)
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..')
+const P={project:'uv-match-height-20-october-2026',repo:'/Users/zenray/Create/Build/Productions/GithubProductions/ZenRayProgress',skill:'/Users/zenray/.claude/skills/zenray-edit',bundle:'20-October-2026-uv-match-height',base:'https://zenray-progress.pages.dev'}
+const {config,requestAssets}=await import(path.join(P.repo,'scripts/Assets/BridgeClient.mjs'))
+const meta=JSON.parse(await fs.readFile(path.join(P.skill,'articles',P.bundle,'Article.json'),'utf8'))
+const proof={checkedAt:new Date().toISOString(),sha256:meta.sha256,receipts:{}}
+let articleReceipt
+for(const [project,source,prefix] of [[P.project,'workshop',`Articles/${P.bundle}`],['zenray-edit','canonical-skill',`articles/${P.bundle}`]]){
+  const state=JSON.parse(await fs.readFile(path.join(config.storage.stateDir,`Project-${project}.json`),'utf8'))
+  const verified=meta.files.filter(file=>{const b=state.backups?.[`${source}:${prefix}/${file.path}`];return b&&b.sha256===file.sha256&&b.size===file.bytes})
+  proof.receipts[project]={expected:meta.files.length,verified:verified.length}
+  if(project===P.project){assert.equal(verified.length,meta.files.length,'Target project article files are not fully archived');articleReceipt=state.backups[`${source}:${prefix}/index.html`]}
+}
+const destination=path.join(ROOT,'Drafts/CloudReadBack-20-October-2026')
+const restored=await exec(process.execPath,[path.join(P.repo,'Cloud/scripts/restaurer.mjs'),articleReceipt.sourceFolder,articleReceipt.relativePath,destination,`--manifest=${articleReceipt.relativeManifest}`,`--sha256=${meta.sha256}`],{cwd:P.repo,timeout:60000,maxBuffer:1048576})
+await fs.writeFile(path.join(ROOT,'Verification/CloudReadBack-20-October-2026.log'),restored.stdout+restored.stderr)
+const result=restored.stdout.split('\n').filter(line=>line.startsWith('{"zr":')).map(line=>JSON.parse(line)).findLast(event=>event.ev==='restaure')
+assert.ok(result?.cible,'Restore command did not confirm its result')
+const bytes=await fs.readFile(result.cible)
+proof.readBack={bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),same:bytes.length===articleReceipt.size&&createHash('sha256').update(bytes).digest('hex')===meta.sha256}
+assert.equal(proof.readBack.same,true)
+const env=await fs.readFile(path.join(P.repo,'.env.local'),'utf8')
+const secret=env.match(/^\s*ZENRAY_API_SECRET\s*=\s*(.*?)\s*$/m)?.[1]?.replace(/^["']|["']$/g,'')
+for(const [name,remotePath] of [['workspace',`pages/ZenRayAssets/${P.project}/.workspace.json`],['catalogue','pages/.zr-assets-workspaces-index.json']]){
+  const response=await fetch(`${P.base}/api/page?action=read&raw=1&fresh=1&path=${encodeURIComponent(remotePath)}`,{headers:secret?{'x-zr-auth':secret}:{},cache:'no-store',signal:AbortSignal.timeout(20000)})
+  assert.equal(response.status,200,`Remote ${name} returned ${response.status}`)
+  const envelope=await response.json()
+  assert.equal(typeof envelope.markdown,'string',`Remote ${name} has no readable document`)
+  const data=JSON.parse(envelope.markdown)
+  const project=name==='workspace'?data:data.projects.find(project=>project.id===P.project)
+  proof[name]={status:response.status,fileId:project?.article?.fileId,sha256:project?.article?.sha256,fileCount:project?.files?.length||project?.stats?.fileCount||null}
+  assert.equal(project?.article?.sha256,meta.sha256,`Remote ${name} has an outdated article`)
+}
+proof.ok=true
+await fs.writeFile(path.join(ROOT,'Verification/PublishedArticle-20-October-2026.json'),JSON.stringify(proof,null,2)+'\n')
+console.log(JSON.stringify(proof))
+if(proof.receipts['zenray-edit'].verified!==meta.files.length)process.exitCode=2
