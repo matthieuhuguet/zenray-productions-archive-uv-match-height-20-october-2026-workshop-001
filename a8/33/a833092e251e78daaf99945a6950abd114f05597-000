@@ -1,0 +1,65 @@
+// 20 October 2026, 15:16 CEST: verify the real Assets reader in an isolated browser against the staged article.
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import os from 'node:os'
+import assert from 'node:assert/strict'
+import {fileURLToPath} from 'node:url'
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..')
+const P={url:'http://127.0.0.1:4201/ArticlePreview-20-October-2026.html',project:'uv-match-height-20-october-2026',viewport:{width:1400,height:1100},playwright:'/Users/zenray/Create/Build/Productions/GithubProductions/ZenRayProgress/node_modules/@playwright/test/index.mjs'}
+const {chromium}=await import(P.playwright)
+const cache=path.join(os.homedir(),'Library/Caches/ms-playwright')
+const versions=(await fs.readdir(cache)).filter(name=>/^chromium_headless_shell-\d+$/.test(name)).sort((a,b)=>Number(a.split('-').at(-1))-Number(b.split('-').at(-1)))
+const browser=await chromium.launch({headless:true,executablePath:path.join(cache,versions.at(-1),'chrome-headless-shell-mac-arm64/chrome-headless-shell')})
+const proof={layouts:{},errors:[],requests:[],externalRequests:[],externalNetwork:[]}
+try {
+  const context=await browser.newContext({viewport:P.viewport})
+  await context.route('https://invalid.example/**',async route=>{proof.externalNetwork.push(route.request().url());await route.fulfill({status:200,body:''})})
+  const page=await context.newPage()
+  page.on('pageerror',error=>proof.errors.push(error.message))
+  page.on('request',request=>{if(request.method()!=='GET')proof.requests.push({method:request.method(),url:request.url()});if(/^https?:/.test(request.url())&&!request.url().startsWith('http://127.0.0.1:4201/'))proof.externalRequests.push(request.url())})
+  await page.goto(P.url)
+  for(const layout of ['classic','tube']) {
+    await page.evaluate(value=>{localStorage.setItem('assets.layout',value)},layout)
+    await page.goto(`${P.url}?project=${P.project}`,{waitUntil:'networkidle'})
+    const iframe=page.locator('iframe[title="UV-Match Height"]')
+    await iframe.waitFor()
+    const frame=page.frameLocator('iframe[title="UV-Match Height"]')
+    await frame.locator('h1').waitFor()
+    const content=await frame.locator('html').evaluate(async root=>{
+      for(const image of document.images)image.loading='eager'
+      await Promise.all([...document.images].map(image=>image.decode()))
+      await document.fonts.ready
+      return {title:document.querySelector('h1').textContent,sections:document.querySelectorAll('main>section').length,prompts:document.querySelectorAll('.prompt-text').length,images:[...document.images].every(image=>image.naturalWidth>0),overflow:root.scrollWidth>innerWidth}
+    })
+    const tabs=page.getByRole('navigation',{name:'Vues du projet'})
+    assert.equal(await tabs.getByRole('button').first().textContent(),'Article')
+    assert.equal(content.sections,8);assert.equal(content.prompts,6);assert.equal(content.images,true);assert.equal(content.overflow,false)
+    await page.screenshot({path:path.join(ROOT,`Verification/AssetsArticle-${layout}-20-October-2026.png`)})
+    await tabs.getByRole('button',{name:/Fichiers/}).click()
+    assert.equal(await iframe.count(),0)
+    assert.ok(await page.getByText('index.html',{exact:true}).count())
+    await tabs.getByRole('button',{name:'Article',exact:true}).click()
+    await iframe.waitFor()
+    proof.layouts[layout]={...content,filesAccessible:true,sandbox:await iframe.getAttribute('sandbox')}
+  }
+  await page.getByRole('button',{name:'Projets',exact:true}).click()
+  const card=page.locator('.tube-card').first()
+  await card.waitFor()
+  proof.home={articleOpening:await card.locator('img').getAttribute('src').then(src=>src.startsWith('data:image/jpeg;base64,')),articleNotLoaded:await page.locator('iframe').count()===0}
+  assert.equal(proof.home.articleOpening,true);assert.equal(proof.home.articleNotLoaded,true)
+  await page.screenshot({path:path.join(ROOT,'Verification/AssetsArticle-home-20-October-2026.png')})
+  proof.security=await page.evaluate(async()=>{
+    const {projectArticleDocument,PROJECT_ARTICLE_CONFIG}=await import('/src/lib/assetsProjectArticle.js')
+    const raw='<h1>Safe article</h1><script>parent.articleEscaped=true</script><img src="https://invalid.example/tracker.png" onerror="parent.articleEscaped=true"><iframe src="https://invalid.example/frame"></iframe><a href="javascript:alert(1)">bad</a><style>@import url(https://invalid.example/remote.css)</style>'
+    const sanitized=projectArticleDocument(raw)
+    const frame=document.createElement('iframe');frame.setAttribute('sandbox',PROJECT_ARTICLE_CONFIG.sandbox);frame.srcdoc=sanitized
+    const loaded=new Promise(resolve=>frame.onload=resolve);document.body.append(frame);await loaded
+    let parentAccessible=true;try{void frame.contentWindow.document.body}catch{parentAccessible=false}
+    const result={noCodeRan:!window.articleEscaped,parentAccessible,scriptsRemoved:!sanitized.includes('<script'),framesRemoved:!sanitized.includes('<iframe'),externalImageRemoved:!sanitized.includes('src="https://invalid.example'),javascriptRemoved:!sanitized.includes('href="javascript:'),policyPresent:sanitized.includes('Content-Security-Policy')}
+    frame.remove();return result
+  })
+  assert.equal(proof.security.noCodeRan,true);assert.equal(proof.security.parentAccessible,false);assert.equal(proof.security.scriptsRemoved,true);assert.equal(proof.security.framesRemoved,true);assert.equal(proof.security.externalImageRemoved,true);assert.equal(proof.security.javascriptRemoved,true);assert.equal(proof.security.policyPresent,true)
+  assert.deepEqual(proof.requests,[]);assert.deepEqual(proof.externalNetwork,[]);assert.deepEqual(proof.errors,[])
+  proof.ok=true
+} catch(error) {proof.ok=false;proof.failure=error.stack;process.exitCode=1}
+finally {await fs.writeFile(path.join(ROOT,'Verification/AssetsArticleCheck-20-October-2026.json'),JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify(proof));await browser.close()}

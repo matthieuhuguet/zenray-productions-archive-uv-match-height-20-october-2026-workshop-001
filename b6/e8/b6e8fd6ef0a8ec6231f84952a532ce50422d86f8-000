@@ -1,0 +1,12 @@
+// 20 October 2026, 15:12 CEST: isolated article review; no proxy or writer can reach the live Assets service.
+import base from '../Drafts/Code/vite.config.js'
+const ROOT='/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026'
+export default {...base,root:`${ROOT}/Drafts/Code`,server:{host:'127.0.0.1',port:4201,strictPort:true,fs:{allow:[ROOT]}},plugins:[...base.plugins,{
+  name:'article-preview-read-only',
+  configureServer(server){server.middlewares.use((request,response,next)=>{
+    if(!request.url.startsWith('/api/'))return next()
+    response.setHeader('Content-Type','application/json')
+    if(request.method!=='GET'){response.statusCode=405;response.end(JSON.stringify({error:'Read-only preview'}));return}
+    response.end(JSON.stringify({markdown:JSON.stringify({schemaVersion:1,covers:{}})}))
+  })},
+}]}

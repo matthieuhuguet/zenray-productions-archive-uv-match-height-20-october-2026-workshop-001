@@ -1,0 +1,19 @@
+# Article UV-Match Height et lecteur Assets (20 October 2026)
+
+- Domaine : revue du lecteur de documents et du registre partagé Assets ; changement préparé localement, publication soumise à la lecture de Matthieu. (20 October 2026)
+- Lecture littérale : résumer la méthode, les six prompts et dix sources, afficher l’article avant les fichiers et sa première page comme miniature. (20 October 2026)
+- Lecture inverse : un HTML incomplet ou exécutant du code rendrait le lecteur inutilisable ; conserver l’ancien affichage évite ce risque mais ne répond pas à la demande. (20 October 2026)
+- Lecture adjacente : comportement sans Mac, préservation des anciens projets, actualisation concurrente de Projects.json et miroir automatique des skills. (20 October 2026)
+- Reformulation : publier une version relue, autonome, explicitement associée au projet, avec ses sources vérifiables et ses fichiers toujours accessibles. (20 October 2026)
+- Incident plausible : le miroir des skills copie le brouillon avant l’accord, ou une inscription du projet depuis un ancien instantané efface une source ajoutée entre-temps. Les protections portent sur ces mécanismes précis. (20 October 2026)
+
+| Rang | Risque | Preuve et contrôle | Niveau |
+|---|---|---|---|
+| 1 | Le brouillon rejoint Assets avant sa lecture. | Source workshop du projet uv-match-height-20-october-2026 : exclude=[Drafts]. Le service com.zenray.skills-sync tourne toutes les 60 secondes ; le classement canonique est donc différé jusqu’à l’accord. Aucun set-article ni archive du lot d’article exécuté. (20 October 2026) | Fort |
+| 2 | Un document accède à l’application ou charge des ressources externes. | assetsProjectArticle.js retire les éléments actifs, ajoute une politique de contenu et impose une iframe sans allow-scripts ni allow-same-origin. AssetsArticleCheck-20-October-2026.json : aucun code exécuté, accès parent refusé, zéro accès réseau externe malgré une feuille CSS hostile proposée. (20 October 2026) | Fort |
+| 3 | L’inscription de l’article écrase une modification indépendante du projet. | AssetsService.test.js vérifie set-article après changement de summary, dependencies et sources ; le setter relit le registre sous registry.lock et ne modifie que article. Les octets changés et une traversée de chemin sont refusés. (20 October 2026) | Fort |
+| 4 | Le HTML autonome est tronqué ou devient illisible hors du Mac. | HTML de 16 762 285 octets, inférieur à 32 MiB ; textes ordinaires limités à 262 144 octets. Tests de lecture complète, repli cloud et erreur visible ; ArticleCheck vérifie les images, six prompts et zéro débordement à 390 px. (20 October 2026) | Moyen |
+| 5 | La nouvelle ouverture masque les fichiers ou modifie les autres projets. | 45 tests ProjectWorkspace existants passent ; cinq tests d’article vérifient les deux présentations, les anciens projets et le document manquant. Le navigateur réel confirme Article puis Fichiers en Classique et Tube et la miniature sans lecture HTML à l’accueil. (20 October 2026) | Moyen |
+
+- Autres axes : pas de changement d’authentification, paiement, politique d’upload ou suppression ; lecture bornée et à la sélection, reprises visibles, retour aux fichiers conservé. Les sources initiales et le checkout principal ne sont pas remplacés. (20 October 2026)
+- Verdict : GO pour l’aperçu local ; publication et déploiement attendent l’accord explicite de Matthieu sur l’article. Les cartes Height et la reconstruction Copernicus de cet atlas ne sont pas exécutées par cette tâche documentaire. (20 October 2026)

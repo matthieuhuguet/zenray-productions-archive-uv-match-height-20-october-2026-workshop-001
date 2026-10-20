@@ -1,0 +1,14 @@
+// 20 October 2026, 15:12 CEST: preview the real Assets component using the staged article, with no publishing controls.
+import React from 'react'
+import {createRoot} from 'react-dom/client'
+import ProjectWorkspace from '../Drafts/Code/src/components/assets/ProjectWorkspace.jsx'
+import '../Drafts/Code/src/fonts.css'
+import data from './ArticlePreviewData-20-October-2026.json'
+const ROOT='/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026'
+const readArticle=async()=>{
+  const response=await fetch(`/@fs${ROOT}/Drafts/Article/index.html`)
+  if(!response.ok)throw new Error(`Article preview ${response.status}`)
+  return response.text()
+}
+const content=document.getElementById('root')
+createRoot(content).render(<ProjectWorkspace projects={[data.project]} activeProjectId={data.project.id} readArticle={readArticle} />)

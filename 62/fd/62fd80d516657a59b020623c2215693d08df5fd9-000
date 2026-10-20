@@ -1,0 +1,43 @@
+{
+  "layouts": {
+    "classic": {
+      "title": "UV-Match Height",
+      "sections": 8,
+      "prompts": 6,
+      "images": true,
+      "overflow": false,
+      "filesAccessible": true,
+      "sandbox": "allow-popups allow-popups-to-escape-sandbox"
+    },
+    "tube": {
+      "title": "UV-Match Height",
+      "sections": 8,
+      "prompts": 6,
+      "images": true,
+      "overflow": false,
+      "filesAccessible": true,
+      "sandbox": "allow-popups allow-popups-to-escape-sandbox"
+    }
+  },
+  "errors": [],
+  "requests": [],
+  "externalRequests": [
+    "http://127.0.0.1:47831/activity",
+    "https://invalid.example/remote.css"
+  ],
+  "externalNetwork": [],
+  "home": {
+    "articleOpening": true,
+    "articleNotLoaded": true
+  },
+  "security": {
+    "noCodeRan": true,
+    "parentAccessible": false,
+    "scriptsRemoved": true,
+    "framesRemoved": true,
+    "externalImageRemoved": true,
+    "javascriptRemoved": true,
+    "policyPresent": true
+  },
+  "ok": true
+}
