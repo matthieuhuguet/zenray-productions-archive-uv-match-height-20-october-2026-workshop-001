@@ -1,0 +1,46 @@
+{
+  "desktop": {
+    "alwaysConsultable": true,
+    "noOverlap": true,
+    "hideAndShow": true,
+    "pinAndPopover": true,
+    "anchorNavigation": true,
+    "sidebarBeforeScroll": 448.84375,
+    "sidebarAfterScroll": 448.84375,
+    "sandbox": "allow-popups allow-popups-to-escape-sandbox"
+  },
+  "mobile": {
+    "overflow": false,
+    "toggleVisible": true,
+    "closedByDefault": true,
+    "openAndClose": true
+  },
+  "negativeControlDetected": true,
+  "viewports": [
+    {
+      "width": 1336,
+      "sidebarVisible": true,
+      "overlap": false,
+      "overflow": false
+    },
+    {
+      "width": 920,
+      "sidebarVisible": true,
+      "overlap": false,
+      "overflow": false
+    },
+    {
+      "width": 664,
+      "sidebarVisible": false,
+      "overlap": false,
+      "overflow": false
+    },
+    {
+      "width": 286,
+      "sidebarVisible": false,
+      "overlap": false,
+      "overflow": false
+    }
+  ],
+  "ok": true
+}

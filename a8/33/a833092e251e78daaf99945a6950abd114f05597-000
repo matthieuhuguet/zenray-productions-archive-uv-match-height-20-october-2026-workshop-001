@@ -33,7 +33,7 @@ try {
     })
     const tabs=page.getByRole('navigation',{name:'Vues du projet'})
     assert.equal(await tabs.getByRole('button').first().textContent(),'Article')
-    assert.equal(content.sections,8);assert.equal(content.prompts,6);assert.equal(content.images,true);assert.equal(content.overflow,false)
+    assert.equal(content.sections,9);assert.equal(content.prompts,6);assert.equal(content.images,true);assert.equal(content.overflow,false)
     await page.screenshot({path:path.join(ROOT,`Verification/AssetsArticle-${layout}-20-October-2026.png`)})
     await tabs.getByRole('button',{name:/Fichiers/}).click()
     assert.equal(await iframe.count(),0)

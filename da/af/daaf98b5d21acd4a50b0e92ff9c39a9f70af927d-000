@@ -1,0 +1,73 @@
+// 20 October 2026, 18:31 CEST: verify the article sidebar in the actual sandbox, including native hide and pin controls.
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import os from 'node:os'
+import assert from 'node:assert/strict'
+import {fileURLToPath} from 'node:url'
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..')
+const P={url:'http://127.0.0.1:4201/ArticlePreview-20-October-2026.html?project=uv-match-height-20-october-2026',viewport:{width:1440,height:1100},mobile:{width:390,height:844},playwright:'/Users/zenray/Create/Build/Productions/GithubProductions/ZenRayProgress/node_modules/@playwright/test/index.mjs'}
+const {chromium}=await import(P.playwright)
+const cache=path.join(os.homedir(),'Library/Caches/ms-playwright')
+const versions=(await fs.readdir(cache)).filter(name=>/^chromium_headless_shell-\d+$/.test(name)).sort((a,b)=>Number(a.split('-').at(-1))-Number(b.split('-').at(-1)))
+const browser=await chromium.launch({headless:true,executablePath:path.join(cache,versions.at(-1),'chrome-headless-shell-mac-arm64/chrome-headless-shell')})
+const proof={}
+try{
+  const page=await browser.newPage({viewport:P.viewport})
+  await page.goto(P.url,{waitUntil:'networkidle'})
+  const iframe=page.locator('iframe[title="UV-Match Height"]');await iframe.waitFor()
+  const handle=await iframe.elementHandle(),frame=await handle.contentFrame()
+  await frame.locator('h1').waitFor();await frame.evaluate(()=>document.fonts.ready)
+  const sidebar=frame.getByRole('complementary',{name:'Sommaire de l’article'})
+  assert.equal(await sidebar.isVisible(),true)
+  assert.equal(await frame.locator('#toc-pin').isChecked(),true)
+  const initial=await sidebar.boundingBox()
+  const mainBox=await frame.locator('main').boundingBox()
+  assert.ok(mainBox.x>=initial.x+initial.width,'Pinned sidebar overlaps the article')
+  await frame.evaluate(()=>window.scrollTo(0,1800))
+  const scrolled=await sidebar.boundingBox()
+  assert.equal(Math.round(initial.y),Math.round(scrolled.y))
+  await frame.locator('.toc-desktop-button').click()
+  assert.equal(await sidebar.isVisible(),false)
+  await frame.locator('.toc-desktop-button').click()
+  assert.equal(await sidebar.isVisible(),true)
+  await frame.locator('.toc-pin').click()
+  assert.equal(await frame.locator('#toc-pin').isChecked(),false)
+  await sidebar.getByRole('link',{name:'Prompt Height',exact:true}).click()
+  assert.equal(await frame.evaluate(()=>location.hash),'#height')
+  await frame.locator('.toc-pin').click()
+  assert.equal(await frame.locator('#toc-pin').isChecked(),true)
+  await frame.evaluate(()=>window.scrollTo(0,0))
+  await page.screenshot({path:path.join(ROOT,'Verification/ArticleSidebar-20-October-2026.png')})
+  proof.desktop={alwaysConsultable:true,noOverlap:true,hideAndShow:true,pinAndPopover:true,anchorNavigation:true,sidebarBeforeScroll:initial.y,sidebarAfterScroll:scrolled.y,sandbox:await iframe.getAttribute('sandbox')}
+  await page.setViewportSize(P.mobile)
+  assert.equal(await frame.locator('.toc-mobile-button').isVisible(),true)
+  assert.equal(await sidebar.isVisible(),false)
+  await frame.locator('.toc-mobile-button').click()
+  assert.equal(await sidebar.isVisible(),true)
+  await frame.locator('.toc-mobile-button').click()
+  assert.equal(await sidebar.isVisible(),false)
+  proof.mobile={overflow:await frame.evaluate(()=>document.documentElement.scrollWidth>innerWidth),toggleVisible:true,closedByDefault:true,openAndClose:true}
+  assert.equal(proof.mobile.overflow,false)
+  await page.screenshot({path:path.join(ROOT,'Verification/ArticleSidebar-mobile-20-October-2026.png')})
+  await frame.evaluate(()=>{const style=document.createElement('style');style.id='negative-control';style.textContent='.article-sidebar{display:flex!important}';document.head.append(style)})
+  proof.negativeControlDetected=await sidebar.isVisible()
+  assert.equal(proof.negativeControlDetected,true,'Broken mobile state was not detected')
+  await frame.evaluate(()=>document.getElementById('negative-control').remove())
+  assert.equal(await sidebar.isVisible(),false)
+  proof.viewports=[]
+  for(const width of [1440,1024,768,390]){
+    await page.setViewportSize({width,height:1100})
+    await frame.evaluate(()=>window.scrollTo(0,0))
+    const state=await frame.evaluate(()=>{
+      const side=document.querySelector('.article-sidebar'),main=document.querySelector('main')
+      const s=side.getBoundingClientRect(),m=main.getBoundingClientRect(),visible=getComputedStyle(side).display!=='none'
+      return {width:innerWidth,sidebarVisible:visible,overlap:visible&&s.left<m.right&&s.right>m.left&&s.top<m.bottom&&s.bottom>m.top,overflow:document.documentElement.scrollWidth>innerWidth}
+    })
+    assert.equal(state.overlap,false);assert.equal(state.overflow,false)
+    if(state.width<=800)assert.equal(state.sidebarVisible,false)
+    await iframe.screenshot({path:path.join(ROOT,`Verification/ArticleViewport-${width}-20-October-2026.png`)})
+    proof.viewports.push(state)
+  }
+  proof.ok=true
+}catch(error){proof.ok=false;proof.failure=error.stack;process.exitCode=1}
+finally{await fs.writeFile(path.join(ROOT,'Verification/ArticleSidebarCheck-20-October-2026.json'),JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify(proof));await browser.close()}

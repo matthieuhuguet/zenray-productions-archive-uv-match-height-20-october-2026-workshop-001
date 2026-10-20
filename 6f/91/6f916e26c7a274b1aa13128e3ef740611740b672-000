@@ -1,0 +1,64 @@
+# 20 October 2026, 18:28 CEST: shorten the editable recap while preserving the six complete prompts and the source manifest.
+import json
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+TARGET = ROOT / 'Drafts/Article/Article-20-October-2026.json'
+article = json.loads(TARGET.read_text())
+original = json.loads((ROOT / 'Drafts/Revisions/V_001-20-October-2026/Article-20-October-2026.json').read_text())
+sections = {section['id']: section for section in article['sections']}
+article.update({
+    'eyebrow': 'Géométrie, UV et matière',
+    'lead': 'Explorer un asset, générer une Height alignée sur ses UV, puis reconstruire un matériau procédural.',
+    'heroText': 'Les UV donnent la place, les six vues identifient les surfaces et le concept définit leur apparence.',
+    'heroCaption': 'Concept science-fiction fourni par Matthieu, généré avec ChatGPT Image.',
+    'footer': 'UV-Match Height · 20 October 2026 · Prompts et sources conservés.',
+})
+sections['method'].update({
+    'title': 'La méthode',
+    'html': '<div class="steps"><div class="step"><span class="step-no">01</span><h3>Géométrie</h3><p>Modèle propre, échelle fixée.</p></div><div class="step"><span class="step-no">02</span><h3>ZenRay UV</h3><p>Dépliage, densité et repères.</p></div><div class="step"><span class="step-no">03</span><h3>Concept + Height</h3><p>Un concept, puis le relief dans les UV.</p></div><div class="step"><span class="step-no">04</span><h3>ZenRay Height</h3><p>Reconstruction Copernicus et cartes PBR.</p></div><div class="step"><span class="step-no">05</span><h3>Itération</h3><p>Vérifier sur le modèle et corriger.</p></div></div><p>Générer les références avec <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer">ChatGPT Image sur chatgpt.com</a>. Si le concept change la silhouette, mettre à jour la géométrie et les UV avant de poursuivre.</p>',
+})
+sections['inputs'].update({
+    'title': 'UV et six vues',
+    'html': '<p>Les deux planches partagent les mêmes numéros : l’atlas situe les surfaces, les six vues les identifient sur le modèle. Ici, le dépliage original de l’artiste compte <strong>33 îlots</strong> et 9,2156 m de coutures. La variante à 15 îlots demande d’autres guides.</p>',
+})
+sections['inputs']['figures'][0]['caption'] = 'L’atlas fixe les contours et les positions. Les couleurs identifient les îlots, pas les matières.'
+sections['inputs']['figures'][1]['caption'] = 'Les mêmes numéros sur le modèle. Ne pas reporter quadrillage ni éclairage dans la Height.'
+sections['explore'].update({
+    'title': 'Explorer, puis choisir',
+    'html': '<p>Depuis les six vues, demander quatre styles distincts, puis retenir une seule proposition. L’exemple Height utilise le concept science-fiction en bas à gauche.</p>',
+})
+sections['explore']['figures'] = [
+    {'id': 'four-concepts', 'caption': 'Quatre directions visuelles pour le même asset.'},
+    {'id': 'top-right-concept', 'caption': 'Autre proposition conservée : surfaces claires, bois et liserés métalliques.', 'collapsed': True, 'label': 'Voir le second crop'},
+]
+article['fileAnchors']['scifi-concept'] = 'article-opening'
+sections['height'].update({
+    'title': 'Le prompt Height',
+    'html': '<p>Joindre <strong>les six vues numérotées + l’atlas correspondant + un concept choisi</strong>. Un tableau supplémentaire sert seulement à lever une ambiguïté de matière ; un même îlot peut en contenir plusieurs.</p>',
+})
+sections['height']['figures'][0]['caption'] = 'La demande fournie réunit les trois images et le prompt. Elle montre l’entrée, pas une Height déjà obtenue.'
+sections['procedural'].update({
+    'title': 'Reconstruire et texturer',
+    'html': '<p>Reproduire la Height dans un graphe Copernicus modifiable, avec masques d’îlots, amplitude réglable et marges. Corriger les bords qui se rejoignent en 3D ; rendre l’atlas globalement répétable ne résout pas ses coutures internes.</p><div class="table-wrap"><table><thead><tr><th>Cartes</th><th>Source</th></tr></thead><tbody><tr><td>Height, Normal, AO</td><td>Relief reconstruit.</td></tr><tr><td>Base Color, Roughness, Metallic</td><td>Concept et masques de matières.</td></tr><tr><td>Emission, Opacity</td><td>Masques dédiés selon le design.</td></tr></tbody></table></div><p>Vérifier sur le modèle : raccords, échelle des motifs, orientation et faux reliefs dus aux reflets. Corriger le graphe, puis itérer.</p><p class="muted">Essai sur cet atlas à réaliser. Résolution, 16 bits et continuité restent à vérifier dans le fichier produit.</p>',
+})
+sections['history'].update({'title': 'Prompts Height d’origine', 'html': '<p>Templates retrouvés pour une texture répétable ou une trim sheet, à adapter aux îlots.</p>'})
+sections['files'].update({'title': 'Fichiers sources', 'html': '<p>HTML autonome, illustrations et polices intégrées. Textes modifiables dans <code>Article-20-October-2026.json</code> ; chemins et empreintes dans <code>Sources-20-October-2026.json</code>.</p>', 'fileIndexCollapsed': True})
+sections['assets'].update({'title': 'Dans Assets', 'html': '<p>L’article devient la première vue du projet et son ouverture sert de miniature. Les fichiers et conversations restent accessibles.</p>'})
+sections['assets']['figures'][0].update({'caption': 'Vue Fichiers avant l’intégration de l’article.', 'collapsed': True, 'label': 'Voir la vue Assets d’origine'})
+
+def prompts(value):
+    return [prompt['text'] for section in value['sections'] for prompt in section.get('prompts', [])]
+
+def prose_words(value):
+    text = ' '.join(str(value.get(key, '')) for key in ['lead', 'heroText', 'heroCaption', 'footer'])
+    for section in value['sections']:
+        text += ' ' + section.get('html', '') + ' ' + ' '.join(figure['caption'] for figure in section.get('figures', []))
+    return len(re.sub('<[^>]+>', ' ', text).split())
+
+assert prompts(original) == prompts(article), 'Prompts must remain intact'
+TARGET.write_text(json.dumps(article, ensure_ascii=False, indent=2) + '\n')
+proof = {'proseBefore': prose_words(original), 'proseAfter': prose_words(article), 'completePrompts': len(prompts(article)), 'versionRetained': str(ROOT / 'Drafts/Revisions/V_001-20-October-2026')}
+(ROOT / 'Verification/ShorterArticle-20-October-2026.json').write_text(json.dumps(proof, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(proof, ensure_ascii=False))

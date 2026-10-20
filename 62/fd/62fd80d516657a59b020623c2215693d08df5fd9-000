@@ -2,7 +2,7 @@
   "layouts": {
     "classic": {
       "title": "UV-Match Height",
-      "sections": 8,
+      "sections": 9,
       "prompts": 6,
       "images": true,
       "overflow": false,
@@ -11,7 +11,7 @@
     },
     "tube": {
       "title": "UV-Match Height",
-      "sections": 8,
+      "sections": 9,
       "prompts": 6,
       "images": true,
       "overflow": false,

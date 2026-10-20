@@ -1,0 +1,42 @@
+# 20 October 2026, 18:35 CEST: factual short descriptions replace editorial phrasing; prompt text remains byte-identical.
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+FILE = ROOT / 'Drafts/Article/Article-20-October-2026.json'
+article = json.loads(FILE.read_text())
+original = json.loads((ROOT / 'Drafts/Revisions/V_001-20-October-2026/Article-20-October-2026.json').read_text())
+sections = {section['id']: section for section in article['sections']}
+article.update({
+    'eyebrow': 'Texturing procédural',
+    'lead': 'Méthode de création de textures à partir d’un atlas UV, de six vues indexées et d’un concept visuel.',
+    'heroText': 'Résultat attendu : une référence Height alignée sur les UV, puis un matériau paramétrable reconstruit dans Copernicus.',
+    'heroCaption': 'Concept science-fiction fourni par Matthieu, généré avec ChatGPT Image.',
+    'status': 'Essai Height sur cet atlas à réaliser',
+    'writingStyle': 'ton neutre court',
+})
+sections['method']['title'] = 'Étapes'
+sections['method']['nav'] = 'Étapes'
+sections['method']['html'] = '<div class="steps"><div class="step"><span class="step-no">01</span><h3>Géométrie</h3><p>Modèle propre, échelle fixée.</p></div><div class="step"><span class="step-no">02</span><h3>ZenRay UV</h3><p>Dépliage, densité et repères.</p></div><div class="step"><span class="step-no">03</span><h3>Concept + Height</h3><p>Concept choisi et référence de relief.</p></div><div class="step"><span class="step-no">04</span><h3>ZenRay Height</h3><p>Reconstruction Copernicus et cartes PBR.</p></div><div class="step"><span class="step-no">05</span><h3>Itération</h3><p>Contrôle du modèle texturé et corrections.</p></div></div><p>Les références sont générées avec <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer">ChatGPT Image sur chatgpt.com</a>. Une modification de silhouette nécessite une mise à jour de la géométrie, des UV et des guides.</p>'
+sections['inputs']['title'] = 'Données d’entrée'
+sections['inputs']['nav'] = 'Données d’entrée'
+sections['inputs']['html'] = '<p>L’atlas UV et les six vues utilisent les mêmes numéros pour identifier les surfaces. Le dépliage original de l’artiste contient <strong>33 îlots</strong> et 9,2156 m de coutures. La variante à 15 îlots utilise d’autres guides.</p>'
+sections['inputs']['figures'][0]['caption'] = 'Atlas UV numéroté. Les couleurs identifient les îlots, pas les matières.'
+sections['inputs']['figures'][1]['caption'] = 'Six vues avec les mêmes numéros. Quadrillage et éclairage sont exclus de la Height.'
+sections['explore']['title'] = 'Exploration visuelle'
+sections['explore']['html'] = '<p>Les six vues servent à générer quatre styles distincts. Une seule proposition est retenue pour la Height. L’exemple utilise le concept science-fiction en bas à gauche.</p>'
+sections['height']['title'] = 'Génération de la Height'
+sections['height']['html'] = '<p>Entrées : <strong>six vues numérotées + atlas UV correspondant + concept choisi</strong>. Un tableau d’attribution est utile si une matière reste ambiguë ; un îlot peut contenir plusieurs matières.</p>'
+sections['height']['figures'][0]['caption'] = 'Exemple fourni : trois images jointes et prompt de génération. Aucune Height produite n’est montrée.'
+sections['procedural']['title'] = 'Reconstruction et cartes PBR'
+sections['procedural']['html'] = '<p>La référence Height est reproduite dans un graphe Copernicus paramétrable, avec masques d’îlots, amplitude et marges. Les corrections concernent les bords qui se rejoignent sur le modèle ; un raccord entre les quatre côtés de l’atlas ne corrige pas ses coutures internes.</p><div class="table-wrap"><table><thead><tr><th>Cartes</th><th>Source</th></tr></thead><tbody><tr><td>Height, Normal, AO</td><td>Relief reconstruit.</td></tr><tr><td>Base Color, Roughness, Metallic</td><td>Concept et masques de matières.</td></tr><tr><td>Emission, Opacity</td><td>Masques dédiés selon le design.</td></tr></tbody></table></div><p>Le contrôle sur le modèle porte sur les raccords, l’échelle et l’orientation des motifs, et les reflets convertis à tort en relief.</p><p class="muted">Essai sur cet atlas à réaliser. Résolution, 16 bits et continuité restent à vérifier dans le fichier produit.</p>'
+sections['history']['html'] = '<p>Prompts d’origine pour une texture répétable ou une trim sheet. Leur application à un atlas d’îlots nécessite une adaptation.</p>'
+sections['assets']['title'] = 'Présentation dans Assets'
+sections['assets']['html'] = '<p>La vue Article précède Fichiers. Sa miniature correspond au début du document. Fichiers, conversations, historique et emplacements restent accessibles.</p>'
+rule = {'id': 'writing', 'eyebrow': '', 'title': 'Règles de rédaction', 'nav': 'Règles de rédaction', 'html': '<p><strong>Ton neutre court.</strong> Présentation de type article, contenu factuel, descriptif et bref. Explications simples, sans figures de style, accroches ni commentaires éditoriaux. Les prompts sont reproduits mot pour mot. Le sommaire reste accessible, masquable et épinglable ; il ne recouvre pas le texte par défaut. Ces règles s’appliquent aux articles descriptifs ZenRay Assets.</p><p class="muted">Consigne de Matthieu, 20 October 2026.</p>'}
+article['sections'] = [section for section in article['sections'] if section['id'] != 'writing'] + [rule]
+current_prompts = [prompt['text'] for section in article['sections'] for prompt in section.get('prompts', [])]
+original_prompts = [prompt['text'] for section in original['sections'] for prompt in section.get('prompts', [])]
+assert current_prompts == original_prompts, 'Prompt text changed'
+FILE.write_text(json.dumps(article, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps({'style': article['writingStyle'], 'sections': len(article['sections']), 'unchangedPrompts': len(current_prompts)}))

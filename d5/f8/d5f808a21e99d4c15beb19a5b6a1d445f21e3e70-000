@@ -1,0 +1,35 @@
+{
+  "projectId": "uv-match-height-20-october-2026",
+  "sessionId": "01a15924-aa22-7300-9533-52fc3fd3f30f",
+  "date": "20 October 2026",
+  "phase": "final tests before approved publication",
+  "authorization": "Matthieu answered OK nickel to publication approval and requested subsequent concise factual wording, a hideable pinnable left contents sidebar, and no default overlap in a narrow frame. All requested edits are applied; no further permission question required.",
+  "latestInstructions": [
+    "ton neutre court: factual descriptive brief, no rhetorical flourishes",
+    "prompt text verbatim; all six strings verified equal to V_001",
+    "write the rules in the current method AND article",
+    "left sidebar hideable/pinnable; narrow document starts closed"
+  ],
+  "article": "/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Drafts/Article/index.html",
+  "sha256": "555eb9a843947d3929413fb8c2bf38d57cfbea33276161a58803110666af2809",
+  "code": "/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Drafts/Code",
+  "codeHead": "a161ee87",
+  "originMainAtRebase": "6132dbfd",
+  "testsSession": 96863,
+  "testsLog": "/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Verification/FinalTests-20-October-2026.log",
+  "proofs": [
+    "ArticleCheck-20-October-2026.json",
+    "AssetsArticleCheck-20-October-2026.json",
+    "ArticleSidebarCheck-20-October-2026.json",
+    "PromptIntegrity-20-October-2026.json"
+  ],
+  "remaining": [
+    "finish full tests; build",
+    "push HEAD to origin/main without force, ff-only main checkout, deploy Pages main and compare served bundle",
+    "safely restart Assets daemon to activate set-article; queued archive jobs resume after restart; inspect active jobs",
+    "file exact approved revision with canonical file-article.mjs (14 declared files), then inspect both archive jobs and cloud receipts",
+    "verify actual cloud article bytes and metadata, finish skill/memory updates and checkpoint/progress",
+    "retry targeted Memory1 commit after preexisting index.lock is released"
+  ],
+  "publicationDone": false
+}

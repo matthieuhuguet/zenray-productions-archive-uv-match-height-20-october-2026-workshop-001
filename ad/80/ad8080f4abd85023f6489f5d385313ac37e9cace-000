@@ -1,7 +1,7 @@
 {
   "desktop": {
     "title": "UV-Match Height",
-    "sections": 8,
+    "sections": 9,
     "prompts": 6,
     "images": true,
     "brokenAnchors": [],
@@ -14,7 +14,7 @@
   },
   "cover": {
     "width": 360,
-    "bytes": 16400
+    "bytes": 12542
   },
   "errors": [],
   "ok": true

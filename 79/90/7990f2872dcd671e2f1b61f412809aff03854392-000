@@ -1,0 +1,22 @@
+
+> zenray-progress@0.1.0 test
+> vitest run scripts/img-ingest.test.js src/lib/assetsProjectArticle.test.js src/timer/TimerContext.test.jsx --maxWorkers=1
+
+
+ RUN  v3.2.6 /Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Drafts/Code
+
+(node:73267) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/timer/TimerContext.test.jsx (3 tests) 23ms
+(node:73272) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/assetsProjectArticle.test.js (6 tests) 13ms
+(node:73277) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ scripts/img-ingest.test.js (4 tests) 45ms
+
+ Test Files  3 passed (3)
+      Tests  13 passed (13)
+   Start at  18:47:29
+   Duration  967ms (transform 44ms, setup 47ms, collect 80ms, tests 81ms, environment 364ms, prepare 67ms)
+
