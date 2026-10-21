@@ -2,7 +2,7 @@
   "projectId": "uv-match-height-20-october-2026",
   "sessionId": "01a15924-aa22-7300-9533-52fc3fd3f30f",
   "date": "20 October 2026",
-  "phase": "application deployed; article archives queued; cloud proof remaining",
+  "phase": "complete; stopped at user request",
   "authorization": "Matthieu answered OK nickel to publication approval and requested subsequent concise factual wording, a hideable pinnable left contents sidebar, and no default overlap in a narrow frame. All requested edits are applied; no further permission question required.",
   "latestInstructions": [
     "ton neutre court: factual descriptive brief, no rhetorical flourishes",
@@ -16,25 +16,21 @@
   "codeHead": "5349d5b6",
   "originMainAtRebase": "cef9ae73",
   "testsSession": 96863,
-  "testsLog": "/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Verification/FinalTests-20-October-2026.log",
+  "testsLog": "/Users/zenray/.claude/tmp/tmp-uv-match-height-20-october-2026/Verification/FinalTestsRetry-20-October-2026.log",
   "proofs": [
     "ArticleCheck-20-October-2026.json",
     "AssetsArticleCheck-20-October-2026.json",
     "ArticleSidebarCheck-20-October-2026.json",
-    "PromptIntegrity-20-October-2026.json"
+    "PromptIntegrity-20-October-2026.json",
+    "PublishedArticle-20-October-2026.json",
+    "ServedBundleRecheck-20-October-2026.json"
   ],
-  "remaining": [
-    "inspect target and zenray-edit archive jobs; verify all 14 target bundle fingerprints",
-    "read actual remote workspace/catalogue references; full cloud readback of HTML via main Cloud/scripts/restaurer.mjs using receipt sourceFolder, relativePath, --manifest and --sha256 into workshop Verification",
-    "append verified publication status in ProjectArticles.md, RecordBundle+CheckContract, sync edit/progress; archive any final method changes and verify",
-    "commit targeted Memory1 and canonical skill changes; update Project1, prompt stacking, checkpoint/progress",
-    "recheck served production bundle and remote data about ten minutes after deployment per standing rule; final concise link and status table"
-  ],
-  "publicationDone": false,
+  "remaining": [],
+  "publicationDone": true,
   "applicationDeployed": true,
   "deployment": "a7804e6c",
   "servedBundle": "assets/index-1N-3mOXB.js",
-  "tests": "Full suite: 2731 passed, 3 old TimerContext tests failed (default changed to 90m). Tests now select an explicit 15m session; those 3 pass. Final changed tests (article, timer, new upstream image ingestion) 13 passed. No timer product code changed.",
+  "tests": "2735 passed; 6 skipped; build and skill contracts passed",
   "canonicalArticle": "/Users/zenray/.claude/skills/zenray-edit/articles/20-October-2026-uv-match-height/index.html",
   "articleFileId": "workshop:Articles/20-October-2026-uv-match-height/index.html",
   "archiveJobs": {
@@ -42,5 +38,7 @@
     "zenrayEdit": "d0e0fe04-a8ac-4047-8afc-72941125fd5e"
   },
   "daemonRestarted": true,
-  "memoryLockRecovered": "Preserved empty stale lock after proving >3h age and no Git writer; proof MemoryLockRecovery-20-October-2026.json. Memory1 commit is now possible."
+  "memoryLockRecovered": "Preserved empty stale lock after proving >3h age and no Git writer; proof MemoryLockRecovery-20-October-2026.json. Memory1 commit is now possible.",
+  "cloudBackupConfirmed": true,
+  "stoppedAtUserRequest": true
 }
